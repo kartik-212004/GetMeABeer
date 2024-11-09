@@ -1,12 +1,10 @@
 "use client"
-import SigninButton from "./signinButton"
-import Image from "next/image"
-import beer from "@/public/beer.png"
+import SigninButton from "./ui/signinButton"
 import BeerButton from "./ui/beerbutton"
 export default function Navbar() {
   return (
     <div className="bg-slate-950 h-14 text-white">
-      <ul className="flex flex-row justify-between py-2 items-center space-x-4">
+      <ul className="flex flex-row justify-between py-1 items-center space-x-4">
         <li>
           <div className="px-4 flex justify-center items-center flex-row">
             {/* <div>Get Me A</div>
