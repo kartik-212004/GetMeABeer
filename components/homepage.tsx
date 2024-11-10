@@ -4,9 +4,10 @@ import good from "@/public/good.webp"
 import Image from "next/image"
 import coin from "@/public/coin.webp"
 import Button from "./ui/button2"
-import money from "@/public/herecomesthemoney.webp"
+import { useRouter } from "next/navigation"
 import coding from "@/public/coding.webp"
 export default function Homepage() {
+  const router = useRouter()
   return (
     <div className="absolute inset-0 -z-10 h-full w-full items-center  py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]">
       <div className="py-12 ">
@@ -32,9 +33,21 @@ export default function Homepage() {
               Cheers to your next big project!
             </h1>
           </div>
-          <div className="space-x-3 py-9">
-            <Button value={"Get Started"} />
-            <Button value={"Read More"} />
+          <div className="space-x-3 flex py-9">
+            <div
+              onClick={() => {
+                router.push("/dashboard")
+              }}
+            >
+              <Button value={"Get Started"} />
+            </div>
+            <div
+              onClick={() => {
+                router.push("/docs")
+              }}
+            >
+              <Button value={"Read More"} />
+            </div>
           </div>
         </div>
       </div>
@@ -46,7 +59,7 @@ export default function Homepage() {
           </h1>
           <div className="container text-lg pt-10 gap-x-40 mx-auto flex justify-center text-center">
             <div className="flex gap-y-2 justify-center flex-col items-center">
-              <Image src={coin} alt="coin" width={110} height={110} />
+              <Image src={coin} alt="coin" width={140} height={140} />
               <h1 className="font-semibold">Fans Want to Cheers</h1>
               <h1>
                 Your fans are here to raise a glass and show their support.
@@ -57,8 +70,8 @@ export default function Homepage() {
                 className="rounded-full"
                 src={coding}
                 alt="coding"
-                width={110}
-                height={110}
+                width={140}
+                height={140}
               />
               <h1 className="font-semibold">Fans want to donate</h1>
               <h1>Your fans are eager to fund your next beer</h1>
@@ -68,13 +81,28 @@ export default function Homepage() {
                 className="rounded-full"
                 src={good}
                 alt="join"
-                width={110}
-                height={110}
+                width={140}
+                height={140}
               />
               <h1 className="font-semibold">Fans want to join</h1>
               <h1>Your fans are eager to be a part of your beer adventures.</h1>
             </div>
           </div>
+          {/* <div className="flex flex-col justify-center items-center ">
+            <div className="text-center py-16">Learn more about us</div>
+            <div>
+              <video width="320" height="240" controls preload="none">
+                <source src="/path/to/video.mp4" type="video/mp4" />
+                <track
+                  src="https://youtu.be/KOnFBHqztbM"
+                  kind="subtitles"
+                  srcLang="en"
+                  label="English"
+                />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div> */}
         </div>
       </div>
     </div>

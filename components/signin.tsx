@@ -1,9 +1,13 @@
 "use client"
 import { signIn } from "next-auth/react"
+import { useState } from "react"
 import { FaGoogle } from "react-icons/fa"
 import { FaGithub } from "react-icons/fa"
-
+import { useRouter } from "next/navigation"
 export default function SignIn() {
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 text-gray-100 flex justify-center items-center p-4">
       <div className="w-full max-w-md relative bg-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-8 shadow-xl">
@@ -17,8 +21,8 @@ export default function SignIn() {
           {/* Social Logins */}
           <div className="space-y-4">
             <button
-              onClick={() => signIn("google")}
-              className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-3 px-4 font-medium flex items-center justify-center space-x-3 transition-all duration-200 hover:shadow-lg hover:shadow-white/5 active:scale-[0.99]"
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+              className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-1 px-4 font-medium flex items-center justify-center space-x-3 transition-all duration-200 hover:shadow-lg hover:shadow-white/5 active:scale-[0.99]"
             >
               <div className="p-1.5 rounded-lg shadow-sm">
                 <FaGoogle size={30} />
@@ -27,8 +31,8 @@ export default function SignIn() {
             </button>
 
             <button
-              onClick={() => signIn("github")}
-              className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-3 px-4 font-medium flex items-center justify-center space-x-3 transition-all duration-200 hover:shadow-lg hover:shadow-white/5 active:scale-[0.99]"
+              onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
+              className="w-full bg-white/10 hover:bg-white/20 text-white rounded-xl py-1 px-4 font-medium flex items-center justify-center space-x-3 transition-all duration-200 hover:shadow-lg hover:shadow-white/5 active:scale-[0.99]"
             >
               <div className=" p-1.5 rounded-lg shadow-sm">
                 <FaGithub size={30} />
@@ -54,6 +58,9 @@ export default function SignIn() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-300">Email</label>
               <input
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                }}
                 className="w-full px-4 py-3 rounded-xl font-medium bg-white/5 border border-gray-700/50 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all"
                 type="email"
                 placeholder="name@example.com"
@@ -65,13 +72,31 @@ export default function SignIn() {
                 Password
               </label>
               <input
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                }}
                 className="w-full px-4 py-3 rounded-xl font-medium bg-white/5 border border-gray-700/50 text-white placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-transparent transition-all"
                 type="password"
                 placeholder="Enter your password"
               />
             </div>
 
-            <button className="w-full bg-violet-600 hover:bg-violet-700 text-white rounded-xl py-3 font-medium transition-all duration-200 hover:shadow-lg hover:shadow-violet-500/25 active:scale-[0.99] group flex items-center justify-center">
+            <button
+              onClick={async () => {
+                const result = await signIn("credentials", {
+                  redirect: false,
+                  email: email,
+                  password: password,
+                })
+
+                if (result?.ok) {
+                  router.push("/dashboard")
+                } else {
+                  alert("Invalid credentials. Please try again.")
+                }
+              }}
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white rounded-xl py-3 font-medium transition-all duration-200 hover:shadow-lg hover:shadow-violet-500/25 active:scale-[0.99] group flex items-center justify-center"
+            >
               <span>Sign In</span>
               <svg
                 className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
@@ -92,7 +117,7 @@ export default function SignIn() {
           {/* Footer */}
           <div className="text-center space-y-4">
             <p className="text-sm text-gray-400">
-              Don't have an account?
+              Dont have an account?
               <a
                 href="#"
                 className="text-violet-400 hover:text-violet-300 font-medium transition-colors"

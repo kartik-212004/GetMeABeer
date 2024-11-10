@@ -1,28 +1,57 @@
 "use client"
 import Image from "next/image"
+import axios from "axios"
 import { signIn } from "next-auth/react"
 import beer from "@/public/beerlogo.png"
-// import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import React, { useState, FormEvent } from "react"
+
 export default function SignupPage() {
-  // const Router = useRouter()
+  const router = useRouter()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [message, setMessage] = useState<{
+    text: string
+    type: "success" | "error"
+  } | null>(null)
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+
+    try {
+      const response = await axios.post("/api/signup", {
+        email,
+        password,
+      })
+
+      if (response.data.status === 400) {
+        setMessage({ text: response.data.message, type: "error" })
+      } else {
+        setMessage({ text: response.data.message, type: "success" })
+        setTimeout(() => router.push("/signin"), 2000)
+      }
+    } catch (error) {
+      setMessage({
+        text: "An error occurred. Please try again.",
+        type: "error",
+      })
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
       <div className="w-full max-w-md space-y-8">
-        {/* Logo */}
         <div className="flex justify-center">
-          <div className="">
-            <Image
-              src={beer}
-              alt="GETMEABEER"
-              width={110}
-              height={110}
-              className="drop-shadow-xl rounded-full"
-            />
-          </div>
+          <Image
+            src={beer}
+            alt="GETMEABEER"
+            width={110}
+            height={110}
+            className="drop-shadow-xl rounded-full"
+          />
         </div>
 
-        {/* Title */}
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-50">
             Create your account
@@ -32,8 +61,17 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {/* Form */}
-        <form className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {message && (
+            <div
+              className={`h-8 text-center font-bold ${
+                message.type === "error" ? "text-red-600" : "text-green-600"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
+
           <div>
             <label
               htmlFor="email"
@@ -42,39 +80,42 @@ export default function SignupPage() {
               Email
             </label>
             <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               type="email"
               id="email"
               placeholder="Enter your email"
-              className="w-full px-4 py-3 rounded-lg text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-600 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-600 focus:border-transparent transition-all"
               required
             />
           </div>
-        </form>
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Password
+            </label>
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              id="password"
+              placeholder="Create a password"
+              className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-600 focus:border-transparent transition-all"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-amber-600 dark:bg-amber-500 text-white py-3 rounded-lg font-semibold hover:bg-amber-700 dark:hover:bg-amber-600 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900"
           >
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Create a password"
-            className="w-full px-4 py-3 rounded-lg text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-600 focus:border-transparent transition-all"
-            required
-          />
-        </div>
+            Sign up
+          </button>
+        </form>
 
-        {/* Sign Up Button */}
-        <button
-          type="submit"
-          className="w-full bg-amber-600 dark:bg-amber-500 text-white py-3 rounded-lg font-semibold hover:bg-amber-700 dark:hover:bg-amber-600 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 dark:focus:ring-offset-gray-900"
-        >
-          Sign up
-        </button>
-
-        {/* Divider */}
         <div className="relative my-4">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
@@ -86,11 +127,10 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Google Button */}
         <button
-          onClick={() => signIn("google")}
+          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
           type="button"
-          className="w-full bg-white dark:bg-gray-800 hover:text-black hover:font-semibold text-gray-900 dark:text-gray-100 py-3 px-4 rounded-lg font-medium border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900 flex items-center justify-center"
+          className="w-full bg-white hover:text-black dark:bg-gray-800 text-gray-900 dark:text-gray-100 py-3 px-4 rounded-lg font-medium border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 dark:focus:ring-offset-gray-900 flex items-center justify-center"
         >
           <svg className="w-5 h-5 mr-3" viewBox="0 0 533.5 544.3">
             <path
@@ -113,7 +153,6 @@ export default function SignupPage() {
           Continue with Google
         </button>
 
-        {/* Footer */}
         <p className="text-sm text-center text-gray-500 dark:text-gray-400">
           Already have an account?{" "}
           <Link
