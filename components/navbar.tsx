@@ -7,7 +7,11 @@ export default function Navbar() {
   return (
     <div className="bg-slate-950 h-14 text-white">
       <ul className="flex flex-row justify-between py-1 items-center space-x-4">
-        <li>
+        <li
+          onClick={() => {
+            router.push("/")
+          }}
+        >
           <div className="px-4 flex justify-center items-center flex-row">
             <BeerButton />
           </div>

@@ -4,6 +4,7 @@ import good from "@/public/good.webp"
 import Image from "next/image"
 import coin from "@/public/coin.webp"
 import Button from "./ui/button2"
+import money from "@/public/herecomesthemoney.webp"
 import coding from "@/public/coding.webp"
 export default function Homepage() {
   return (
