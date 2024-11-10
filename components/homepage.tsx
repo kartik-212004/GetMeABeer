@@ -20,13 +20,13 @@ export default function Homepage() {
               height={50}
             />
           </div>
-          <div className="flex flex-col text-xl text-blue-100 text-center w-[58rem] space-y-6 py-8">
+          <div className="flex flex-col text-xl text-center w-[58rem] space-y-6 py-8">
             <h1>
               Get your projects funded by your fans—one beer at a time. On Get
               Me a Beer, your supporters can buy you a beer to help fund your
               creative journey.
             </h1>
-            <h1 className="text-blue-300 text-lg">
+            <h1 className="text-lg">
               Unleash the power of your community and bring your ideas to life.
               Cheers to your next big project!
             </h1>
@@ -46,7 +46,7 @@ export default function Homepage() {
           <div className="container text-lg pt-10 gap-x-40 mx-auto flex justify-center text-center">
             <div className="flex gap-y-2 justify-center flex-col items-center">
               <Image src={coin} alt="coin" width={110} height={110} />
-              <h1>Fans Want to Cheers</h1>
+              <h1 className="font-semibold">Fans Want to Cheers</h1>
               <h1>
                 Your fans are here to raise a glass and show their support.
               </h1>
@@ -59,7 +59,7 @@ export default function Homepage() {
                 width={110}
                 height={110}
               />
-              <h1>Fans want to donate:</h1>
+              <h1 className="font-semibold">Fans want to donate</h1>
               <h1>Your fans are eager to fund your next beer</h1>
             </div>
             <div className="flex gap-y-2  justify-center flex-col items-center">
@@ -70,7 +70,7 @@ export default function Homepage() {
                 width={110}
                 height={110}
               />
-              <h1>Fans want to join:</h1>
+              <h1 className="font-semibold">Fans want to join</h1>
               <h1>Your fans are eager to be a part of your beer adventures.</h1>
             </div>
           </div>
