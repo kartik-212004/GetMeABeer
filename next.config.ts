@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
+// next.config.mjs
+import { NextConfig } from "next"
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+const nextConfig = {
+  images: {
+    domains: ["lh3.googleusercontent.com", "avatars.githubusercontent.com","th.bing.com"]
+  },
+} satisfies NextConfig
 
-export default nextConfig;
+export default nextConfig

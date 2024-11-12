@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import Github from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
+import nodp from "@/public/nodp.jpg"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
 import { PrismaClient } from "@prisma/client"
@@ -50,6 +51,15 @@ const handler = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async session({ user, session }) {
+      if (!session.user.image) {
+        session.user.image =
+          "https://th.bing.com/th/id/OIP.qw42y3S9KyR2Wn9JVAWArgHaHa?rs=1&pid=ImgDetMain"
+      }
+      return session
+    },
+  },
   pages: {
     signIn: "/signin",
   },

@@ -4,9 +4,11 @@ import good from "@/public/good.webp"
 import Image from "next/image"
 import coin from "@/public/coin.webp"
 import Button from "./ui/button2"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import coding from "@/public/coding.webp"
 export default function Homepage() {
+  const { data: session, status } = useSession()
   const router = useRouter()
   return (
     <div className="absolute inset-0 -z-10 h-full w-full items-center  py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]">
@@ -36,7 +38,10 @@ export default function Homepage() {
           <div className="space-x-3 flex py-9">
             <div
               onClick={() => {
-                router.push("/dashboard")
+                if (session) {
+                  return router.push("/dashboard")
+                }
+                return router.push("/signin")
               }}
             >
               <Button value={"Get Started"} />
