@@ -2,7 +2,12 @@
 import Image from "next/image"
 import rain from "@/public/tokyo.gif"
 import { useSession } from "next-auth/react"
+import Paybutton from "@/components/ui/paybutton"
+import { useState } from "react"
 export default function Dashboard() {
+  const [username, setName] = useState("")
+  const [useremail, setEmail] = useState("")
+  const [amount, setAmount] = useState("")
   const session = useSession()
   const name = session.data?.user?.name
   const email = session.data?.user?.email
@@ -44,9 +49,40 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
-            <div className="container mx-auto">
-              <div></div>
-              <div></div>
+            <div className="text-white flex flex-row justify-around container mx-auto space-x-4">
+              <div className="bg-gray-900 rounded-md p-10 min-h-96 w-[50rem]">
+                <div>Top Payers</div>
+              </div>
+              <div className="bg-gray-900 rounded-md p-10 min-h-96 w-[50rem]">
+                <p className="text-xl font-semibold">Make A Payment</p>
+                <div className="flex flex-col my-4 space-y-3">
+                  <input
+                    onChange={(e) => {
+                      setName(e.target.value)
+                    }}
+                    className=" h-10 outline-none px-4 rounded-md bg-gray-800 "
+                    placeholder=" Enter Name"
+                    type="text"
+                  />
+                  <input
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                    }}
+                    className=" h-10 outline-none px-4 rounded-md bg-gray-800 "
+                    placeholder=" Enter Email"
+                    type="text"
+                  />
+                  <input
+                    onChange={(e) => {
+                      setAmount(e.target.value)
+                    }}
+                    className=" h-10 outline-none px-4 rounded-md bg-gray-800 "
+                    placeholder=" Enter Amount"
+                    type="text"
+                  />
+                  <Paybutton value="PAY" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
