@@ -14,7 +14,7 @@ export default function Navbar() {
   }
 
   return (
-    <div className="bg-slate-950 h-14 text-white">
+    <div className="bg-gray-950 h-14 text-white">
       <ul className="flex flex-row justify-between py-1 items-center space-x-4">
         <li
           onClick={() => {
