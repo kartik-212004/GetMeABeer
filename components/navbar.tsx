@@ -1,6 +1,7 @@
 "use client"
 import SigninButton from "./ui/signinButton"
 import BeerButton from "./ui/beerbutton"
+import Logout from "./ui/logout"
 import { useRouter } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
 
@@ -25,11 +26,9 @@ export default function Navbar() {
           </div>
         </li>
         <div className="flex flex-row px-4 space-x-2">
-          {status === "loading" ? (
-            <p>Loading...</p>
-          ) : session ? (
+          {session ? (
             <li onClick={handleSignOut}>
-              <SigninButton value={"Sign Out"} />
+              <Logout value="Log Out" />
             </li>
           ) : (
             <>

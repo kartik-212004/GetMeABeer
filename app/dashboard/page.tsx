@@ -1,10 +1,12 @@
 "use client"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import rain from "@/public/tokyo.gif"
 import { useSession } from "next-auth/react"
 import Paybutton from "@/components/ui/paybutton"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 export default function Dashboard() {
+  const router = useRouter()
   const [username, setName] = useState("")
   const [useremail, setEmail] = useState("")
   const [amount, setAmount] = useState("")
@@ -13,6 +15,8 @@ export default function Dashboard() {
   const email = session.data?.user?.email
   const slic = email?.slice(0, email.indexOf("@"))
   const Photo = session?.data?.user?.image
+
+  function submit() {}
   return (
     <div className="relative h-screen w-full bg-slate-950">
       <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
@@ -80,7 +84,12 @@ export default function Dashboard() {
                     placeholder=" Enter Amount"
                     type="text"
                   />
-                  <Paybutton value="PAY" />
+                  <button
+                    onClick={submit}
+                    className="relative inline-flex h-12 active:scale-95 transistion overflow-hidden rounded-lg p-[1px] focus:outline-none"
+                  >
+                    <Paybutton value="PAY" />
+                  </button>
                 </div>
               </div>
             </div>

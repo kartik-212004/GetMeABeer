@@ -15,7 +15,7 @@ export default function Homepage() {
       <div className="py-12 ">
         <div className="flex flex-col text-gray-200 items-center justify-center">
           <div className="justify-center  flex items-center">
-            <h1 className="text-6xl font-bold font-mono">Get Me A Beer</h1>
+            <h1 className="text-7xl font-bold font-mono">Get Me A Beer</h1>
             <Image
               className=" mx-2"
               src={beer1}
@@ -24,18 +24,16 @@ export default function Homepage() {
               height={50}
             />
           </div>
-          <div className="flex flex-col text-xl text-center w-[58rem] space-y-6 py-8">
+          <div className="flex flex-col font-medium text-[#e5e7eb] text-2xl text-center w-[55rem] space-y-6 pt-8">
             <h1>
               Get your projects funded by your fans—one beer at a time. On Get
               Me a Beer, your supporters can buy you a beer to help fund your
-              creative journey.
+              creative journey. Unleash the power of your community and bring
+              your ideas to life.
             </h1>
-            <h1 className="text-lg">
-              Unleash the power of your community and bring your ideas to life.
-              Cheers to your next big project!
-            </h1>
+            <h1 className="text-lg"></h1>
           </div>
-          <div className="space-x-3 flex py-9">
+          <div className="space-x-3 flex py-7">
             <div
               onClick={() => {
                 if (session) {
@@ -64,9 +62,9 @@ export default function Homepage() {
           </h1>
           <div className="container text-lg pt-10 gap-x-40 mx-auto flex justify-center text-center">
             <div className="flex gap-y-2 justify-center flex-col items-center">
-              <Image src={coin} alt="coin" width={140} height={140} />
-              <h1 className="font-semibold">Fans Want to Cheers</h1>
-              <h1>
+              <Image src={coin} alt="coin" width={200} height={200} />
+              <h1 className="font-bold text-xl">Fans Want to Cheers</h1>
+              <h1 className="font-semibold">
                 Your fans are here to raise a glass and show their support.
               </h1>
             </div>
@@ -75,22 +73,26 @@ export default function Homepage() {
                 className="rounded-full"
                 src={coding}
                 alt="coding"
-                width={140}
-                height={140}
+                width={200}
+                height={200}
               />
-              <h1 className="font-semibold">Fans want to donate</h1>
-              <h1>Your fans are eager to fund your next beer</h1>
+              <h1 className="font-bold text-xl">Fans want to donate</h1>
+              <h1 className="font-semibold">
+                Your fans are eager to fund your next beer
+              </h1>
             </div>
             <div className="flex gap-y-2  justify-center flex-col items-center">
               <Image
                 className="rounded-full"
                 src={good}
                 alt="join"
-                width={140}
-                height={140}
+                width={200}
+                height={200}
               />
-              <h1 className="font-semibold">Fans want to join</h1>
-              <h1>Your fans are eager to be a part of your beer adventures.</h1>
+              <h1 className="font-bold text-xl">Fans want to join</h1>
+              <h1 className="font-semibold">
+                Your fans are eager to be a part of your beer adventures.
+              </h1>
             </div>
           </div>
           {/* <div className="flex flex-col justify-center items-center ">
