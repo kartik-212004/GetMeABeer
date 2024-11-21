@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import coding from "@/public/coding.webp"
 export default function Homepage() {
-  const session=useSession()
+  const session = useSession()
   const router = useRouter()
   return (
     <div className="relative size-full min-h-screen bg-slate-950">

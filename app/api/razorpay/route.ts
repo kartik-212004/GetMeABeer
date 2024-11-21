@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import Razorpay from "razorpay"
 
-if (!process.env.RAZORPAY_ID || !process.env.RAZORPAY_SECRET) {
+if (!process.env.NEXT_PUBLIC_RAZORPAY_ID || !process.env.RAZORPAY_SECRET) {
   throw new Error("Missing Razorpay environment variables")
 }
 
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_ID || "",
+  key_id: process.env.NEXT_PUBLIC_RAZORPAY_ID || "",
   key_secret: process.env.RAZORPAY_SECRET || "",
 })
 
@@ -25,10 +25,14 @@ export async function POST(req: NextRequest) {
       amount: amount * 100,
       currency: "INR",
       receipt: `Receipt_${Date.now()}`,
+      notes: {
+        customerName: username,
+        costumerEmail: useremail,
+      },
     })
     console.log(order)
     return NextResponse.json({ status: 200, order: order })
   } catch (error) {
-    return NextResponse.json({ status: 500 })
+    return NextResponse.json({ status: 500, error: error })
   }
 }
