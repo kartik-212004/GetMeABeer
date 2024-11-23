@@ -7,8 +7,9 @@ import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Script from "next/script"
 import rain from "@/public/tokyo.gif"
+import { ToastContainer, toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
-// Type definitions
 interface RazorpayOptions {
   key_id: string
   amount: number
@@ -31,34 +32,29 @@ interface RazorpayOptions {
 export default function Dashboard() {
   const Router = useRouter()
   const searchParams = useSearchParams()
-  const success = searchParams.get("success")
+  const success = searchParams?.get("success")
 
-  // State management
   const [error, setError] = useState("")
   const [username, setName] = useState("")
   const [useremail, setEmail] = useState("")
   const [amount, setAmount] = useState("")
 
-  // Session and user data
   const { data: session } = useSession()
   const name = session?.user?.name
   const email = session?.user?.email
   const slic = email?.slice(0, email.indexOf("@"))
   const Photo = session?.user?.image
 
-  // Payment success/failure tracking
   useEffect(() => {
     if (success === "true") {
-      alert("Payment Successful!")
-      // Optionally, you could clear the search params or redirect
+      toast.success("Payment Successful")
       Router.replace("/dashboard")
     } else if (success === "false") {
-      alert("Payment Failed!")
+      toast.error("Payment Failed")
       Router.replace("/dashboard")
     }
   }, [success, Router])
 
-  // Input validation
   const validateInputs = () => {
     if (!username || !useremail || !amount) {
       setError("Input is Empty")
@@ -66,7 +62,6 @@ export default function Dashboard() {
       return false
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(useremail)) {
       setError("Invalid Email Format")
@@ -74,7 +69,6 @@ export default function Dashboard() {
       return false
     }
 
-    // Amount validation
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount) || numAmount <= 0) {
       setError("Invalid Amount")
@@ -85,12 +79,9 @@ export default function Dashboard() {
     return true
   }
 
-  // Submit payment
   async function submit() {
-    // Validate inputs first
     if (!validateInputs()) return
 
-    // Ensure user is logged in
     if (!session) {
       Router.push("/")
       return
@@ -102,6 +93,7 @@ export default function Dashboard() {
         useremail,
         amount,
       })
+      console.log(response)
       const { order } = response.data
 
       const options: RazorpayOptions = {
@@ -148,7 +140,7 @@ export default function Dashboard() {
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="beforeInteractive"
       />
-
+      <ToastContainer theme="dark" />
       <div className="relative h-screen w-full bg-slate-950">
         <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
           <div>
@@ -217,7 +209,7 @@ export default function Dashboard() {
                         setAmount(e.target.value)
                       }}
                       className=" h-10 outline-none px-4 rounded-md bg-gray-800 "
-                      placeholder="Enter Amount ( ₹ 20)"
+                      placeholder="Enter Amount ( ₹ 20 ) "
                       type="number"
                     />
 

@@ -12,3 +12,13 @@ model User {
   email    String @unique
   password String
 }
+
+model Transaction {
+  id            String   @id @default(uuid())
+  amount        Int
+  createdAt     DateTime @default(now())
+  orderId       String
+  customerEmail String
+  customerName  String
+  receipt       String
+}
