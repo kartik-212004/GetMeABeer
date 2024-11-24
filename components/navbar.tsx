@@ -7,7 +7,7 @@ import { useSession, signOut } from "next-auth/react"
 
 export default function Navbar() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/signin" })
@@ -28,7 +28,7 @@ export default function Navbar() {
         <div className="flex flex-row px-4 space-x-2">
           {session ? (
             <li onClick={handleSignOut}>
-              <Logout value="Log Out" />
+              <Logout />
             </li>
           ) : (
             <>

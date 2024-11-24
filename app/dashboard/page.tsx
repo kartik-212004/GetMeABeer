@@ -1,17 +1,26 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import axios from "axios"
 import { useSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import Script from "next/script"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import Paybutton from "@/components/ui/paybutton"
 import rain from "@/public/tokyo.gif"
 
-// Types
+declare global {
+  interface Window {
+    Razorpay?: new (options: RazorpayOptions) => RazorpayInstance
+  }
+}
+
+interface RazorpayInstance {
+  open: () => void
+}
+
 interface Transaction {
   customerName: string
   amount: number
@@ -58,19 +67,16 @@ const INITIAL_FORM_STATE: PaymentFormData = {
 }
 
 export default function Dashboard() {
-  // Hooks
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session } = useSession()
   const success = searchParams?.get("success")
 
-  // State
   const [formData, setFormData] = useState<PaymentFormData>(INITIAL_FORM_STATE)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  // Derived values
   const userEmail = session?.user?.email || ""
   const userName = session?.user?.name || userEmail.split("@")[0]
   const userPhoto = session?.user?.image
@@ -123,7 +129,7 @@ export default function Dashboard() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-    setError("") // Clear error when user starts typing
+    setError("")
   }
 
   const handleSubmit = async () => {
@@ -180,7 +186,7 @@ export default function Dashboard() {
       }
 
       if (typeof window !== "undefined" && window.Razorpay) {
-        const razorpay = new (window as any).Razorpay(options)
+        const razorpay = new window.Razorpay(options)
         razorpay.open()
       } else {
         throw new Error("Razorpay SDK not loaded")
@@ -196,7 +202,7 @@ export default function Dashboard() {
   if (!transactions) return null
 
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="beforeInteractive"
@@ -323,6 +329,6 @@ export default function Dashboard() {
           </main>
         </div>
       </div>
-    </>
+    </Suspense>
   )
 }

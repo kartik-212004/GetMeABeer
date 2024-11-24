@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import Razorpay from "razorpay"
-import { PrismaClient } from "@prisma/client"
-const prisma = new PrismaClient()
 if (!process.env.NEXT_PUBLIC_RAZORPAY_ID || !process.env.RAZORPAY_SECRET) {
   throw new Error("Missing Razorpay environment variables")
 }

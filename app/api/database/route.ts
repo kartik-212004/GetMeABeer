@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   })
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const transactions = await prisma.transaction.findMany({
     take: 6,
     orderBy: {

@@ -33,7 +33,7 @@ export default function SignupPage() {
       }
     } catch (error) {
       setMessage({
-        text: "An error occurred. Please try again.",
+        text: `An error occurred. Please try again ${error}`,
         type: "error",
       })
     }

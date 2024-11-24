@@ -95,21 +95,7 @@ export default function Homepage() {
               </h1>
             </div>
           </div>
-          {/* <div className="flex flex-col justify-center items-center ">
-            <div className="text-center py-16">Learn more about us</div>
-            <div>
-              <video width="320" height="240" controls preload="none">
-                <source src="/path/to/video.mp4" type="video/mp4" />
-                <track
-                  src="https://youtu.be/KOnFBHqztbM"
-                  kind="subtitles"
-                  srcLang="en"
-                  label="English"
-                />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div> */}
+       
         </div>
       </div>
     </div>

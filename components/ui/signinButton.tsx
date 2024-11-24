@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 
-const SigninButton = ({ value }) => {
+const SigninButton = ({ value }: { value: string }) => {
   return (
     <div className="relative group">
       <button className="relative inline-block p-px font-semibold leading-6 text-white  shadow-2xl cursor-pointer rounded-xl shadow-zinc-900 transition-transform duration-300 ease-in-out hover:scale-105 active:scale-95">
