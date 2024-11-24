@@ -1,3 +1,4 @@
+"use client"
 export default function Logout({ value }: { value: string }) {
   return (
     <button className="group flex items-center justify-start w-10 h-10 bg-red-600 rounded-full cursor-pointer relative overflow-hidden transition-all duration-200 shadow-lg hover:w-28 hover:rounded-lg active:translate-x-1 active:translate-y-1">

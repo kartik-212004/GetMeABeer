@@ -1,14 +1,34 @@
 "use client"
+
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import axios from "axios"
 import { useSession } from "next-auth/react"
-import Paybutton from "@/components/ui/paybutton"
-import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Script from "next/script"
-import rain from "@/public/tokyo.gif"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import Paybutton from "@/components/ui/paybutton"
+import rain from "@/public/tokyo.gif"
+
+// Types
+interface Transaction {
+  customerName: string
+  amount: number
+  message?: string
+}
+
+interface PaymentFormData {
+  username: string
+  useremail: string
+  amount: string
+  message: string
+}
+
+interface RazorpayResponse {
+  razorpay_payment_id: string
+  razorpay_order_id: string
+}
 
 interface RazorpayOptions {
   key_id: string
@@ -17,6 +37,7 @@ interface RazorpayOptions {
   name: string
   order_id: string
   callback_url: string
+  handler: (response: RazorpayResponse) => void
   prefill: {
     name: string
     email: string
@@ -29,71 +50,96 @@ interface RazorpayOptions {
   }
 }
 
+const INITIAL_FORM_STATE: PaymentFormData = {
+  username: "",
+  useremail: "",
+  amount: "",
+  message: "",
+}
+
 export default function Dashboard() {
-  const Router = useRouter()
+  // Hooks
+  const router = useRouter()
   const searchParams = useSearchParams()
+  const { data: session } = useSession()
   const success = searchParams?.get("success")
 
+  // State
+  const [formData, setFormData] = useState<PaymentFormData>(INITIAL_FORM_STATE)
   const [error, setError] = useState("")
-  const [username, setName] = useState("")
-  const [useremail, setEmail] = useState("")
-  const [amount, setAmount] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  const { data: session } = useSession()
-  const name = session?.user?.name
-  const email = session?.user?.email
-  const slic = email?.slice(0, email.indexOf("@"))
-  const Photo = session?.user?.image
+  // Derived values
+  const userEmail = session?.user?.email || ""
+  const userName = session?.user?.name || userEmail.split("@")[0]
+  const userPhoto = session?.user?.image
 
   useEffect(() => {
-    if (success === "true") {
-      toast.success("Payment Successful")
-      Router.replace("/dashboard")
-    } else if (success === "false") {
-      toast.error("Payment Failed")
-      Router.replace("/dashboard")
-    }
-  }, [success, Router])
+    const fetchTransactions = async () => {
+      try {
+        const response = await axios.get("/api/database")
+        setTransactions(response.data)
 
-  const validateInputs = () => {
+        if (success === "true") {
+          toast.success("Payment Successful")
+          router.replace("/dashboard")
+        } else if (success === "false") {
+          toast.error("Payment Failed")
+          router.replace("/dashboard")
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error)
+        toast.error("Failed to fetch transaction data")
+      }
+    }
+
+    fetchTransactions()
+  }, [success, router])
+
+  const validateForm = (): boolean => {
+    const { username, useremail, amount } = formData
+
     if (!username || !useremail || !amount) {
-      setError("Input is Empty")
-      setTimeout(() => setError(""), 1500)
+      setError("All fields are required")
       return false
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(useremail)) {
-      setError("Invalid Email Format")
-      setTimeout(() => setError(""), 1500)
+      setError("Invalid email format")
       return false
     }
 
     const numAmount = parseFloat(amount)
     if (isNaN(numAmount) || numAmount <= 0) {
-      setError("Invalid Amount")
-      setTimeout(() => setError(""), 1500)
+      setError("Amount must be greater than 0")
       return false
     }
 
     return true
   }
 
-  async function submit() {
-    if (!validateInputs()) return
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+    setError("") // Clear error when user starts typing
+  }
 
+  const handleSubmit = async () => {
     if (!session) {
-      Router.push("/")
+      router.push("/")
       return
     }
 
+    if (!validateForm()) {
+      setTimeout(() => setError(""), 3000)
+      return
+    }
+
+    setIsSubmitting(true)
     try {
-      const response = await axios.post("/api/razorpay", {
-        username,
-        useremail,
-        amount,
-      })
-      console.log(response)
+      const response = await axios.post("/api/razorpay", formData)
       const { order } = response.data
 
       const options: RazorpayOptions = {
@@ -102,6 +148,14 @@ export default function Dashboard() {
         currency: order.currency,
         name: order.notes.customerName,
         order_id: order.id,
+        handler: async (response: RazorpayResponse) => {
+          await axios.post("/api/database", {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            order,
+            message: formData.message,
+          })
+        },
         callback_url: "/dashboard/?success=true",
         prefill: {
           name: order.notes.customerName,
@@ -117,22 +171,19 @@ export default function Dashboard() {
 
       if (typeof window !== "undefined" && window.Razorpay) {
         const razorpay = new (window as any).Razorpay(options)
-        razorpay.on("payment.success", function (response: any) {
-          alert(
-            "Payment Successful! Payment ID: " + response.razorpay_payment_id
-          )
-        })
         razorpay.open()
       } else {
-        console.error("Razorpay SDK is not loaded")
-        setError("Payment system not available")
+        throw new Error("Razorpay SDK not loaded")
       }
     } catch (error) {
-      console.error("Payment initiation failed", error)
-      setError("Failed to process payment")
-      setTimeout(() => setError(""), 1500)
+      console.error("Payment initiation failed:", error)
+      toast.error("Failed to process payment")
+    } finally {
+      setIsSubmitting(false)
     }
   }
+
+  if (!transactions) return null
 
   return (
     <>
@@ -140,90 +191,126 @@ export default function Dashboard() {
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="beforeInteractive"
       />
-      <ToastContainer theme="dark" />
-      <div className="relative h-screen w-full bg-slate-950">
-        <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
-          <div>
-            <div>
-              <div className="relative w-full h-[30vh]">
+      <ToastContainer theme="dark" position="top-right" />
+
+      <div className="relative min-h-screen w-full bg-slate-950">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
+          <header className="relative">
+            <div className="h-[30vh] w-full">
+              <Image
+                className="object-cover object-center w-full h-full"
+                src={rain}
+                alt="city background"
+                priority
+              />
+            </div>
+
+            {userPhoto && (
+              <div className="absolute left-1/2 -bottom-24 -translate-x-1/2">
                 <Image
-                  className="object-cover w-full h-[30vh] object-center"
-                  src={rain}
-                  alt="city"
+                  className="rounded-full"
+                  width={200}
+                  height={200}
+                  src={userPhoto}
+                  alt={userName}
+                  priority
                 />
               </div>
-              <div className=" flex justify-center items-center w-full h-0 absolute ">
-                {Photo && (
-                  <Image
-                    className="object-cover rounded-full"
-                    width={200}
-                    height={200}
-                    src={Photo}
-                    alt="${name}"
-                  />
-                )}
-              </div>
-              <div className="flex flex-col justify-end font-semibold text-xl items-center bg-red mt-32 text-white ">
-                {name ? <div> {`@${name}`}</div> : <div> {`@${slic}`}</div>}
+            )}
+          </header>
 
-                {name ? (
-                  <div className="text-gray-400 text-lg my-4">
-                    {`Hello ${name}, a little support from you could help fuel my next big idea! How about a virtual cheers? 🍻`}
-                  </div>
-                ) : (
-                  <div className="text-gray-400 text-lg my-4">
-                    {`Hello ${slic}, a little support from you could help fuel my next big idea! How about a virtual cheers? 🍻`}
-                  </div>
-                )}
-              </div>
-              <div className="text-white flex flex-row justify-around container mx-auto space-x-4">
-                <div className="bg-gray-900 rounded-md p-10 min-h-96 w-[50rem]">
-                  <div>Top Payers</div>
-                </div>
-                <div className="bg-gray-900 rounded-md p-10 min-h-96 w-[50rem]">
-                  <div className="flex flex-row justify-between">
-                    <p className="text-xl font-semibold">Make A Payment</p>
-                    <p className="text-red-500 font-semibold text-lg">
-                      {error}
-                    </p>
-                  </div>
-                  <div className="flex flex-col my-4 space-y-3">
-                    <input
-                      onChange={(e) => {
-                        setName(e.target.value)
-                      }}
-                      className=" h-10 outline-none px-4 rounded-md bg-gray-800 "
-                      placeholder="Enter Name ( Ramesh )"
-                      type="text"
-                    />
-                    <input
-                      onChange={(e) => {
-                        setEmail(e.target.value)
-                      }}
-                      className=" h-10 outline-none px-4 rounded-md bg-gray-800 "
-                      placeholder="Email ( Samboxer@gmail.com )"
-                      type="email"
-                    />
-                    <input
-                      onChange={(e) => {
-                        setAmount(e.target.value)
-                      }}
-                      className=" h-10 outline-none px-4 rounded-md bg-gray-800 "
-                      placeholder="Enter Amount ( ₹ 20 ) "
-                      type="number"
-                    />
-
-                    <button
-                      onClick={submit}
-                      className="relative inline-flex h-12 active:scale-95 transistion overflow-hidden rounded-lg p-[1px] focus:outline-none"
-                    >
-                      <Paybutton value="PAY" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+          <main className="container mx-auto px-4 mt-32">
+            <div className="text-center text-white mb-12">
+              <h1 className="text-xl font-semibold mb-4">@{userName}</h1>
+              <p className="text-gray-400">
+                Hello {userName}, a little support from you could help fuel my
+                next big idea! How about a virtual cheers? 🍻
+              </p>
             </div>
-          </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <section className="bg-gray-900 rounded-lg p-8">
+                <h2 className="text-2xl text-blue-400 text-center mb-6">
+                  Supporters
+                </h2>
+                <ol className="space-y-4">
+                  {transactions &&
+                    transactions.map((transaction, index) => (
+                      <li
+                        key={index}
+                        className="text-white flex items-center gap-2"
+                      >
+                        <span>{transaction.customerName} paid you</span>
+                        <span className="text-yellow-500">
+                          ₹{transaction.amount}
+                        </span>
+                        {transaction.message && (
+                          <>
+                            {" "}
+                            <div>with a message</div>
+                            <span className="text-green-400">
+                              - {transaction.message}
+                            </span>
+                          </>
+                        )}
+                      </li>
+                    ))}
+                </ol>
+              </section>
+
+              <section className="bg-gray-900 rounded-lg p-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl text-white font-semibold">
+                    Make A Payment
+                  </h2>
+                  {error && <p className="text-red-500 font-medium">{error}</p>}
+                </div>
+
+                <form className="space-y-4">
+                  <input
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Your Name"
+                    type="text"
+                  />
+                  <input
+                    name="useremail"
+                    value={formData.useremail}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Your Email"
+                    type="email"
+                  />
+                  <input
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Amount (₹)"
+                    type="number"
+                    min="1"
+                  />
+                  <input
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Message (optional)"
+                    type="text"
+                  />
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="w-full relative inline-flex h-12 overflow-hidden rounded-lg p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform"
+                  >
+                    <Paybutton value={isSubmitting ? "Processing..." : "PAY"} />
+                  </button>
+                </form>
+              </section>
+            </div>
+          </main>
         </div>
       </div>
     </>

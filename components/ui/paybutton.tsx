@@ -1,3 +1,4 @@
+"use client"
 export default function Paybutton({ value }: { value: string }) {
   return (
     /* From Uiverse.io by Itskrish01 */

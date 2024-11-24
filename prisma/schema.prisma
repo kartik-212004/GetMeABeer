@@ -14,11 +14,15 @@ model User {
 }
 
 model Transaction {
-  id            String   @id @default(uuid())
-  amount        Int
-  createdAt     DateTime @default(now())
-  orderId       String
-  customerEmail String
-  customerName  String
-  receipt       String
+  id                  String   @id @default(uuid())
+  amount              Int
+  createdAt           DateTime @default(now())
+  orderId             String
+  customerEmail       String
+  customerName        String
+  receipt             String
+  status              String
+  razorpay_payment_id String
+  razorpay_order_id   String
+  message             String
 }

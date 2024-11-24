@@ -31,17 +31,6 @@ export async function POST(req: NextRequest) {
         costumerEmail: useremail,
       },
     })
-    const create = await prisma.transaction.create({
-      data: {
-        amount: order.amount,
-        orderId: order.id,
-        customerEmail: order?.notes?.costumerEmail,
-        customerName: order?.notes?.customerName,
-        receipt: order.receipt,
-      },
-    })
-    console.log(order)
-    console.log(create)
     return NextResponse.json({ status: 200, order: order })
   } catch (error) {
     return NextResponse.json({ status: 500, error: error })

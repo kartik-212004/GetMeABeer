@@ -31,7 +31,6 @@ const handler = NextAuth({
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         })
-        console.log(user)
         if (!user) {
           console.log("No user found with this email.")
           return null

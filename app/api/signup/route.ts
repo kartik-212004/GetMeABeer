@@ -34,3 +34,7 @@ export async function POST(req: NextRequest) {
     message: "Account successfully created",
   })
 }
+export async function GET(req: NextRequest) {
+  const data = await prisma.transaction.findMany({})
+  return NextResponse.json(data)
+}
