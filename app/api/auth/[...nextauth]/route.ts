@@ -7,7 +7,6 @@ import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
-
 const handler = NextAuth({
   providers: [
     Github({
@@ -22,18 +21,16 @@ const handler = NextAuth({
       name: "Email",
       credentials: {
         email: { label: "Email", type: "text", placeholder: "Email" },
-        password: { label: "Password", type: "password", placeholder: "Password" },
+        password: {
+          label: "Password",
+          type: "password",
+          placeholder: "Password",
+        },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          console.log("Email or password is missing.")
-          return null
-        }
-
+      async authorize(credentials: any) {
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         })
-
         if (!user) {
           console.log("No user found with this email.")
           return null
@@ -48,21 +45,19 @@ const handler = NextAuth({
           console.log("Password is incorrect.")
           return null
         }
-
         return { id: user.id, email: user.email }
       },
     }),
   ],
   callbacks: {
-    async session({ session }) {
-      if (session.user) {
+    async session({ user, session }) {
+      if (!session.user.image) {
         session.user.image =
-          session.user.image ?? "https://th.bing.com/th/id/OIP.qw42y3S9KyR2Wn9JVAWArgHaHa?rs=1&pid=ImgDetMain"
+          "https://th.bing.com/th/id/OIP.qw42y3S9KyR2Wn9JVAWArgHaHa?rs=1&pid=ImgDetMain"
       }
       return session
     },
   },
-
   pages: {
     signIn: "/signin",
   },
