@@ -117,19 +117,25 @@ docker run -p 3000:3000 get-me-a-beer
 ## 📂 **Folder Structure**
 
 ```plaintext
-📦 get-me-a-beer
- ┣ 📂pages
- ┃ ┣ 📂api
- ┃ ┣ 📂auth
- ┃ ┗ 📜index.tsx
+📦 getmeabeer
+ ┣ 📂.vscode
+ ┣ 📂app
  ┣ 📂components
- ┣ 📂styles
+ ┣ 📂pages
  ┣ 📂prisma
  ┣ 📂public
- ┣ 📜.env.local
+ ┣ 📜.env.example
+ ┣ 📜.eslintrc.json
+ ┣ 📜.gitignore
  ┣ 📜Dockerfile
+ ┣ 📜README.md
+ ┣ 📜next.config.ts
+ ┣ 📜package-lock.json
  ┣ 📜package.json
- ┗ 📜README.md
+ ┣ 📜postcss.config.mjs
+ ┣ 📜tailwind.config.ts
+ ┣ 📜tsconfig.json
+ ┗ 📜yarn.lock
 ```
 
 ---
