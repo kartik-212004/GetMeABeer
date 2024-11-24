@@ -149,6 +149,16 @@ export default function Dashboard() {
         name: order.notes.customerName,
         order_id: order.id,
         handler: async (response: RazorpayResponse) => {
+          const newTransaction: Transaction = {
+            customerName: formData.username,
+            amount: parseFloat(formData.amount),
+            message: formData.message,
+          }
+
+          setTransactions((prevTransactions) => [
+            ...prevTransactions,
+            newTransaction,
+          ])
           await axios.post("/api/database", {
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_order_id: response.razorpay_order_id,
@@ -238,7 +248,7 @@ export default function Dashboard() {
                     transactions.map((transaction, index) => (
                       <li
                         key={index}
-                        className="text-white flex items-center gap-2"
+                        className="text-white flex  items-center gap-2"
                       >
                         <span>{transaction.customerName} paid you</span>
                         <span className="text-yellow-500">
@@ -248,7 +258,7 @@ export default function Dashboard() {
                           <>
                             {" "}
                             <div>with a message</div>
-                            <span className="text-green-400">
+                            <span className="text-orange-500  font-semibold">
                               - {transaction.message}
                             </span>
                           </>
