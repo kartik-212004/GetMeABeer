@@ -47,11 +47,14 @@ npm install
 ### **3. Configure Environment Variables**
 Create a `.env.local` file in the root directory with the following values:
 ```env
-DATABASE_URL=your_database_url
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
-RAZORPAY_KEY_ID=your_razorpay_key_id
-RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+DATABASE_URL="postgresql://awdawdawd:awdawd@localhost:5432/awdawdawd?schema=public"
+GOOGLE_ID=awdawdawdawdawd
+GOOGLE_SECRET=awdawdawd-d7YHu3RqthquYbNZjUOpLrDRrGmo
+GITHUB_ID=awdawdawd
+GITHUB_SECRET=awdawdawdawd
+NEXT_PUBLIC_RAZORPAY_ID=awdawdadawd
+RAZORPAY_SECRET=awdawdawd
+SECRET=aawdawdawd
 ```
 
 ### **4. Start Development Server**
