@@ -26,7 +26,7 @@ export default function Homepage() {
             />
           </div>
           <div className="flex flex-col font-medium text-[#e5e7eb] text-2xl text-center w-[55rem] space-y-6 pt-8">
-            <h1>
+            <h1 className="text-xl">
               Get your projects funded by your fans—one beer at a time. On Get
               Me a Beer, your supporters can buy you a beer to help fund your
               creative journey. Unleash the power of your community and bring
@@ -95,7 +95,6 @@ export default function Homepage() {
               </h1>
             </div>
           </div>
-       
         </div>
       </div>
     </div>

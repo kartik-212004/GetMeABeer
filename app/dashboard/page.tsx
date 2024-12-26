@@ -1,10 +1,9 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Image from "next/image"
 import axios from "axios"
 import { useSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense } from "react"
 import Script from "next/script"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
@@ -66,11 +65,27 @@ const INITIAL_FORM_STATE: PaymentFormData = {
   message: "",
 }
 
+function PaymentStatus() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const success = searchParams?.get("success")
+
+  useEffect(() => {
+    if (success === "true") {
+      toast.success("Payment Successful")
+      router.replace("/dashboard")
+    } else if (success === "false") {
+      toast.error("Payment Failed")
+      router.replace("/dashboard")
+    }
+  }, [success, router])
+
+  return null
+}
+
 export default function Dashboard() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { data: session } = useSession()
-  const success = searchParams?.get("success")
 
   const [formData, setFormData] = useState<PaymentFormData>(INITIAL_FORM_STATE)
   const [error, setError] = useState("")
@@ -86,14 +101,6 @@ export default function Dashboard() {
       try {
         const response = await axios.get("/api/database")
         setTransactions(response.data)
-
-        if (success === "true") {
-          toast.success("Payment Successful")
-          router.replace("/dashboard")
-        } else if (success === "false") {
-          toast.error("Payment Failed")
-          router.replace("/dashboard")
-        }
       } catch (error) {
         console.error("Error fetching transactions:", error)
         toast.error("Failed to fetch transaction data")
@@ -101,7 +108,7 @@ export default function Dashboard() {
     }
 
     fetchTransactions()
-  }, [success, router])
+  }, [])
 
   const validateForm = (): boolean => {
     const { username, useremail, amount } = formData
@@ -202,133 +209,135 @@ export default function Dashboard() {
   if (!transactions) return null
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <div className="relative min-h-screen w-full bg-slate-950">
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="beforeInteractive"
       />
       <ToastContainer theme="dark" position="top-right" />
+      <Suspense fallback={null}>
+        <PaymentStatus />
+      </Suspense>
 
-      <div className="relative min-h-screen w-full bg-slate-950">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
-          <header className="relative">
-            <div className="h-[30vh] w-full">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
+        <header className="relative">
+          <div className="h-[30vh] w-full">
+            <Image
+              className="object-cover object-center w-full h-full"
+              src={rain}
+              alt="city background"
+              priority
+            />
+          </div>
+
+          {userPhoto && (
+            <div className="absolute left-1/2 -bottom-24 -translate-x-1/2">
               <Image
-                className="object-cover object-center w-full h-full"
-                src={rain}
-                alt="city background"
+                className="rounded-full"
+                width={200}
+                height={200}
+                src={userPhoto}
+                alt={userName}
                 priority
               />
             </div>
+          )}
+        </header>
 
-            {userPhoto && (
-              <div className="absolute left-1/2 -bottom-24 -translate-x-1/2">
-                <Image
-                  className="rounded-full"
-                  width={200}
-                  height={200}
-                  src={userPhoto}
-                  alt={userName}
-                  priority
-                />
-              </div>
-            )}
-          </header>
+        <main className="container mx-auto px-4 mt-32">
+          <div className="text-center text-white mb-12">
+            <h1 className="text-xl font-semibold mb-4">@{userName}</h1>
+            <p className="text-gray-400">
+              Hello {userName}, a little support from you could help fuel my
+              next big idea! How about a virtual cheers? 🍻
+            </p>
+          </div>
 
-          <main className="container mx-auto px-4 mt-32">
-            <div className="text-center text-white mb-12">
-              <h1 className="text-xl font-semibold mb-4">@{userName}</h1>
-              <p className="text-gray-400">
-                Hello {userName}, a little support from you could help fuel my
-                next big idea! How about a virtual cheers? 🍻
-              </p>
-            </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            <section className="bg-gray-900 rounded-lg p-8">
+              <h2 className="text-2xl text-blue-400 text-center mb-6">
+                Supporters
+              </h2>
+              <ol className="space-y-4">
+                {transactions &&
+                  transactions.map((transaction, index) => (
+                    <li
+                      key={index}
+                      className="text-white flex items-center gap-2"
+                    >
+                      <span>{transaction.customerName} paid you</span>
+                      <span className="text-yellow-500">
+                        ₹{transaction.amount}
+                      </span>
+                      {transaction.message && (
+                        <>
+                          {" "}
+                          <div>with a message</div>
+                          <span className="text-orange-500 font-semibold">
+                            - {transaction.message}
+                          </span>
+                        </>
+                      )}
+                    </li>
+                  ))}
+              </ol>
+            </section>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              <section className="bg-gray-900 rounded-lg p-8">
-                <h2 className="text-2xl text-blue-400 text-center mb-6">
-                  Supporters
+            <section className="bg-gray-900 rounded-lg p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl text-white font-semibold">
+                  Make A Payment
                 </h2>
-                <ol className="space-y-4">
-                  {transactions &&
-                    transactions.map((transaction, index) => (
-                      <li
-                        key={index}
-                        className="text-white flex  items-center gap-2"
-                      >
-                        <span>{transaction.customerName} paid you</span>
-                        <span className="text-yellow-500">
-                          ₹{transaction.amount}
-                        </span>
-                        {transaction.message && (
-                          <>
-                            {" "}
-                            <div>with a message</div>
-                            <span className="text-orange-500  font-semibold">
-                              - {transaction.message}
-                            </span>
-                          </>
-                        )}
-                      </li>
-                    ))}
-                </ol>
-              </section>
+                {error && <p className="text-red-500 font-medium">{error}</p>}
+              </div>
 
-              <section className="bg-gray-900 rounded-lg p-8">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl text-white font-semibold">
-                    Make A Payment
-                  </h2>
-                  {error && <p className="text-red-500 font-medium">{error}</p>}
-                </div>
-
-                <form className="space-y-4">
-                  <input
-                    name="username"
-                    value={formData.username}
-                    onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Your Name"
-                    type="text"
-                  />
-                  <input
-                    name="useremail"
-                    value={formData.useremail}
-                    onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Your Email"
-                    type="email"
-                  />
-                  <input
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Amount (₹)"
-                    type="number"
-                    min="1"
-                  />
-                  <input
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Message (optional)"
-                    type="text"
-                  />
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="w-full relative inline-flex h-12 overflow-hidden rounded-lg p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform"
-                  >
-                    <Paybutton value={isSubmitting ? "Processing..." : "PAY"} />
-                  </button>
-                </form>
-              </section>
-            </div>
-          </main>
-        </div>
+              <form className="space-y-4">
+                <input
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your Name"
+                  type="text"
+                />
+                <input
+                  name="useremail"
+                  value={formData.useremail}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your Email"
+                  type="email"
+                />
+                <input
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Amount (₹)"
+                  type="number"
+                  min="1"
+                />
+                <input
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Message (optional)"
+                  type="text"
+                />
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  type="button"
+                  className="w-full relative inline-flex h-12 overflow-hidden rounded-lg p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform"
+                >
+                  <Paybutton value={isSubmitting ? "Processing..." : "PAY"} />
+                </button>
+              </form>
+            </section>
+          </div>
+        </main>
       </div>
-    </Suspense>
+    </div>
   )
 }

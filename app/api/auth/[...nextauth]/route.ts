@@ -10,12 +10,12 @@ const prisma = new PrismaClient()
 const handler = NextAuth({
   providers: [
     Github({
-      clientSecret: process.env.GITHUB_SECRET || "",
-      clientId: process.env.GITHUB_ID || "",
+      clientSecret: process.env.GITHUB_SECRET ?? "",
+      clientId: process.env.GITHUB_ID ?? "",
     }),
     Google({
-      clientSecret: process.env.GOOGLE_SECRET || "",
-      clientId: process.env.GOOGLE_ID || "",
+      clientSecret: process.env.GOOGLE_SECRET ?? "",
+      clientId: process.env.GOOGLE_ID ?? "",
     }),
     CredentialsProvider({
       name: "Email",
@@ -27,13 +27,17 @@ const handler = NextAuth({
           placeholder: "Password",
         },
       },
-      async authorize(credentials: any) {
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Missing credentials")
+        }
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         })
-        if (!user) {
-          console.log("No user found with this email.")
-          return null
+
+        if (!user?.password) {
+          throw new Error("No user found with this email")
         }
 
         const isPasswordCorrect = await bcrypt.compare(
@@ -42,19 +46,24 @@ const handler = NextAuth({
         )
 
         if (!isPasswordCorrect) {
-          console.log("Password is incorrect.")
-          return null
+          throw new Error("Invalid password")
         }
-        return { id: user.id, email: user.email }
+
+        return {
+          id: user.id,
+          email: user.email
+        }
       },
     }),
   ],
   callbacks: {
-    async session({ user, session }) {
-      if (!session.user.image) {
-        session.user.image =
-          "https://th.bing.com/th/id/OIP.qw42y3S9KyR2Wn9JVAWArgHaHa?rs=1&pid=ImgDetMain"
+    async session({ session }) {
+      if (!session?.user) {
+        throw new Error("Session user is undefined")
       }
+      
+      session.user.image ??= "https://th.bing.com/th/id/OIP.qw42y3S9KyR2Wn9JVAWArgHaHa?rs=1&pid=ImgDetMain"
+      
       return session
     },
   },
