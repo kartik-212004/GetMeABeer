@@ -209,7 +209,7 @@ export default function Dashboard() {
   if (!transactions) return null
 
   return (
-    <div className="relative min-h-screen w-full bg-slate-950">
+    <div className="relative min-h-screen w-full py-20 bg-slate-950">
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="beforeInteractive"
