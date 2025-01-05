@@ -209,7 +209,7 @@ export default function Dashboard() {
   if (!transactions) return null
 
   return (
-    <div className="relative min-h-screen w-full py-20 bg-slate-950">
+    <div className="relative min-h-screen w-full bg-slate-950">
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="beforeInteractive"
@@ -219,7 +219,7 @@ export default function Dashboard() {
         <PaymentStatus />
       </Suspense>
 
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
+      <div className="absolute max-h-max inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
         <header className="relative">
           <div className="h-[30vh] w-full">
             <Image
@@ -244,98 +244,99 @@ export default function Dashboard() {
           )}
         </header>
 
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 mt-16 sm:mt-24 lg:mt-32">
-  <div className="text-center text-white mb-8 sm:mb-12">
-    <h1 className="text-lg sm:text-xl lg:text-2xl font-semibold mb-2 sm:mb-4">@{userName}</h1>
-    <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto">
-      Hello {userName}, a little support from you could help fuel my
-      next big idea! How about a virtual cheers? 🍻
-    </p>
-  </div>
+        <main className="container mx-auto px-4 mt-32">
+          <div className="text-center text-white mb-12">
+            <h1 className="text-xl font-semibold mb-4">@{userName}</h1>
+            <p className="text-gray-400">
+              Hello {userName}, a little support from you could help fuel my
+              next big idea! How about a virtual cheers? 🍻
+            </p>
+          </div>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-    <section className="bg-gray-900 rounded-lg p-4 sm:p-6 lg:p-8 max-h-[60vh] overflow-y-auto">
-      <h2 className="text-xl sm:text-2xl text-blue-400 text-center mb-4 sm:mb-6">
-        Supporters
-      </h2>
-      <ol className="space-y-3 sm:space-y-4">
-        {transactions &&
-          transactions.map((transaction, index) => (
-            <li
-              key={index}
-              className="text-white text-sm sm:text-base flex flex-wrap items-center gap-2"
-            >
-              <span>{transaction.customerName} paid you</span>
-              <span className="text-yellow-500">
-                ₹{transaction.amount}
-              </span>
-              {transaction.message && (
-                <>
-                  <div className="text-gray-400">with a message</div>
-                  <span className="text-orange-500 font-semibold break-all">
-                    - {transaction.message}
-                  </span>
-                </>
-              )}
-            </li>
-          ))}
-      </ol>
-    </section>
+          <div className="grid md:grid-cols-2 gap-8">
+            <section className="bg-gray-900 rounded-lg p-8">
+              <h2 className="text-2xl text-blue-400 text-center mb-6">
+                Supporters
+              </h2>
+              <ol className="space-y-4">
+                {transactions &&
+                  transactions.map((transaction, index) => (
+                    <li
+                      key={index}
+                      className="text-white flex items-center gap-2"
+                    >
+                      <span>{transaction.customerName} paid you</span>
+                      <span className="text-yellow-500">
+                        ₹{transaction.amount}
+                      </span>
+                      {transaction.message && (
+                        <>
+                          {" "}
+                          <div>with a message</div>
+                          <span className="text-orange-500 font-semibold">
+                            - {transaction.message}
+                          </span>
+                        </>
+                      )}
+                    </li>
+                  ))}
+              </ol>
+            </section>
 
-    <section className="bg-gray-900 rounded-lg p-4 sm:p-6 lg:p-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6">
-        <h2 className="text-lg sm:text-xl text-white font-semibold mb-2 sm:mb-0">
-          Make A Payment
-        </h2>
-        {error && <p className="text-red-500 text-sm sm:text-base font-medium">{error}</p>}
-      </div>
+            <section className="bg-gray-900 rounded-lg p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl text-white font-semibold">
+                  Make A Payment
+                </h2>
+                {error && <p className="text-red-500 font-medium">{error}</p>}
+              </div>
 
-      <form className="space-y-3 sm:space-y-4">
-        <input
-          name="username"
-          value={formData.username}
-          onChange={handleInputChange}
-          className="w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          placeholder="Your Name"
-          type="text"
-        />
-        <input
-          name="useremail"
-          value={formData.useremail}
-          onChange={handleInputChange}
-          className="w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          placeholder="Your Email"
-          type="email"
-        />
-        <input
-          name="amount"
-          value={formData.amount}
-          onChange={handleInputChange}
-          className="w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          placeholder="Amount (₹)"
-          type="number"
-          min="1"
-        />
-        <input
-          name="message"
-          value={formData.message}
-          onChange={handleInputChange}
-          className="w-full h-10 sm:h-12 px-3 sm:px-4 text-sm sm:text-base rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-          placeholder="Message (optional)"
-          type="text"
-        />
-        <button
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          type="button"
-          className="w-full relative inline-flex h-10 sm:h-12 overflow-hidden rounded-lg p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform"
-        >
-          <Paybutton value={isSubmitting ? "Processing..." : "PAY"} />
-        </button>
-      </form>
-    </section>
-  </div>
-</main>
+              <form className="space-y-4">
+                <input
+                  name="username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your Name"
+                  type="text"
+                />
+                <input
+                  name="useremail"
+                  value={formData.useremail}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your Email"
+                  type="email"
+                />
+                <input
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Amount (₹)"
+                  type="number"
+                  min="1"
+                />
+                <input
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  className="w-full h-12 px-4 rounded-md bg-gray-800 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Message (optional)"
+                  type="text"
+                />
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  type="button"
+                  className="w-full relative inline-flex h-12 overflow-hidden rounded-lg p-[1px] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 transition-transform"
+                >
+                  <Paybutton value={isSubmitting ? "Processing..." : "PAY"} />
+                </button>
+              </form>
+            </section>
+          </div>
+        </main>
       </div>
     </div>
   )
