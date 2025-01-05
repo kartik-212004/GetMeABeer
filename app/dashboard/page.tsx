@@ -69,7 +69,6 @@ function PaymentStatus() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const success = searchParams?.get("success")
-
   useEffect(() => {
     if (success === "true") {
       toast.success("Payment Successful")
@@ -79,10 +78,8 @@ function PaymentStatus() {
       router.replace("/dashboard")
     }
   }, [success, router])
-
   return null
 }
-
 export default function Dashboard() {
   const router = useRouter()
   const { data: session } = useSession()
@@ -218,8 +215,7 @@ export default function Dashboard() {
       <Suspense fallback={null}>
         <PaymentStatus />
       </Suspense>
-
-      <div className=" h-[105vh] inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
+      <div className=" inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
         <header className="relative">
           <div className="h-[30vh] w-full">
             <Image
@@ -229,7 +225,6 @@ export default function Dashboard() {
               priority
             />
           </div>
-
           {userPhoto && (
             <div className="absolute left-1/2 -bottom-24 -translate-x-1/2">
               <Image
@@ -243,7 +238,6 @@ export default function Dashboard() {
             </div>
           )}
         </header>
-
         <main className="container mx-auto px-4 mt-32">
           <div className="text-center text-white mb-12">
             <h1 className="text-xl font-semibold mb-4">@{userName}</h1>
@@ -252,9 +246,8 @@ export default function Dashboard() {
               next big idea! How about a virtual cheers? 🍻
             </p>
           </div>
-
           <div className="grid md:grid-cols-2 gap-8">
-            <section className="bg-gray-900 rounded-lg p-8">
+            <section className="bg-gray-900 rounded-lg p-4">
               <h2 className="text-2xl text-blue-400 text-center mb-6">
                 Supporters
               </h2>
@@ -282,8 +275,7 @@ export default function Dashboard() {
                   ))}
               </ol>
             </section>
-
-            <section className="bg-gray-900 rounded-lg p-8">
+            <section className="bg-gray-900 rounded-lg p-4">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl text-white font-semibold">
                   Make A Payment
