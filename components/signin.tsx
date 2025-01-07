@@ -119,7 +119,7 @@ export default function SignIn() {
             <p className="text-sm text-gray-400">
               Dont have an account?
               <a
-                href="#"
+                href="/signup"
                 className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
               >
                 Sign up
