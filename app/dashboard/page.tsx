@@ -255,6 +255,7 @@ export default function Dashboard() {
                 {transactions &&
                   transactions.map((transaction, index) => (
                     <li
+                    
                       key={index}
                       className="text-white flex items-center gap-2"
                     >
