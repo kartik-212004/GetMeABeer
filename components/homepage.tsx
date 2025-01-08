@@ -6,12 +6,13 @@ import coin from "@/public/coin.webp"
 import Button from "./ui/button2"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { Loader } from "./ui/loading"
 import coding from "@/public/coding.webp"
 export default function Homepage() {
   const session = useSession()
   const router = useRouter()
   return (
-    <div className="relative size-full max-h-screen bg-slate-950">
+    <div className="relative size-full h-[calc(100vh-3.5rem)] bg-slate-950">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       <div className="py-12 ">
         <div className="flex flex-col text-gray-200 items-center justify-center">
@@ -37,6 +38,9 @@ export default function Homepage() {
           <div className="space-x-3 flex py-7">
             <div
               onClick={() => {
+                if (session.status === "loading") {
+                  return <Loader />
+                }
                 if (session.status === "authenticated") {
                   return router.push("/dashboard")
                 }

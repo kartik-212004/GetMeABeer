@@ -206,7 +206,7 @@ export default function Dashboard() {
   if (!transactions) return null
 
   return (
-    <div className="relative min-h-screen w-full bg-slate-950">
+    <div className="relative  h-[calc(100vh-3.5rem)] w-full bg-slate-950">
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="beforeInteractive"
@@ -255,20 +255,19 @@ export default function Dashboard() {
                 {transactions &&
                   transactions.map((transaction, index) => (
                     <li
-                    
                       key={index}
-                      className="text-white flex items-center gap-2"
+                      className="text-gray-200 flex items-center gap-2"
                     >
                       <span>{transaction.customerName} paid you</span>
-                      <span className="text-yellow-500">
+                      <span className="text-white font-bold">
                         ₹{transaction.amount}
                       </span>
                       {transaction.message && (
                         <>
                           {" "}
-                          <div>with a message</div>
-                          <span className="text-orange-500 font-semibold">
-                            - {transaction.message}
+                          <div>with a message - </div>
+                          <span className="text-teal-400 font-semibold">
+                            {transaction.message}
                           </span>
                         </>
                       )}
