@@ -37,6 +37,9 @@ export default function Homepage() {
           <div className="space-x-3 flex py-7">
             <div
               onClick={() => {
+                if (session.status === "loading") {
+                  return <div>Loading...</div>
+                }
                 if (session.status === "authenticated") {
                   return router.push("/dashboard")
                 }
