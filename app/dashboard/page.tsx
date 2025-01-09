@@ -2,7 +2,7 @@
 import { useState, useEffect, Suspense } from "react"
 import Image from "next/image"
 import axios from "axios"
-import { Loader } from "@/components/ui/loading"
+import Loader from "@/components/ui/loading"
 import { useSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Script from "next/script"
@@ -83,7 +83,7 @@ function PaymentStatus() {
 }
 export default function Dashboard() {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [formData, setFormData] = useState<PaymentFormData>(INITIAL_FORM_STATE)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
