@@ -6,7 +6,6 @@ import coin from "@/public/coin.webp"
 import Button from "./ui/button2"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Loader } from "./ui/loading"
 import coding from "@/public/coding.webp"
 export default function Homepage() {
   const session = useSession()
@@ -38,9 +37,6 @@ export default function Homepage() {
           <div className="space-x-3 flex py-7">
             <div
               onClick={() => {
-                if (session.status === "loading") {
-                  return <Loader />
-                }
                 if (session.status === "authenticated") {
                   return router.push("/dashboard")
                 }

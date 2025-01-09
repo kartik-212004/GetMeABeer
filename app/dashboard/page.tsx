@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense } from "react"
 import Image from "next/image"
 import axios from "axios"
+import { Loader } from "@/components/ui/loading"
 import { useSession } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Script from "next/script"
@@ -83,7 +84,6 @@ function PaymentStatus() {
 export default function Dashboard() {
   const router = useRouter()
   const { data: session } = useSession()
-
   const [formData, setFormData] = useState<PaymentFormData>(INITIAL_FORM_STATE)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -204,9 +204,16 @@ export default function Dashboard() {
   }
 
   if (!transactions) return null
+  if (status === "loading") {
+    return <Loader />
+  }
 
+  if (status === "unauthenticated") {
+    router.push("/")
+    return null
+  }
   return (
-    <div className="relative  h-[calc(100vh-3.5rem)] w-full bg-slate-950">
+    <div className="relative h-[calc(100vh-3.5rem)] w-full bg-slate-950">
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="beforeInteractive"
@@ -215,7 +222,7 @@ export default function Dashboard() {
       <Suspense fallback={null}>
         <PaymentStatus />
       </Suspense>
-      <div className=" inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
+      <div className="inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
         <header className="relative">
           <div className="h-[30vh] w-full">
             <Image
