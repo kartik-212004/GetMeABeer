@@ -44,9 +44,12 @@ interface RazorpayOptions {
   amount: number
   currency: string
   name: string
+  description: string
   order_id: string
-  callback_url: string
   handler: (response: RazorpayResponse) => void
+  modal: {
+    ondismiss: () => void
+  }
   prefill: {
     name: string
     email: string
@@ -138,11 +141,13 @@ export default function Dashboard() {
 
   const handleSubmit = async () => {
     if (!session) {
+      toast.error("Please sign in to make a payment")
       router.push("/")
       return
     }
 
     if (!validateForm()) {
+      toast.error(error)
       setTimeout(() => setError(""), 3000)
       return
     }
@@ -150,33 +155,51 @@ export default function Dashboard() {
     setIsSubmitting(true)
     try {
       const response = await axios.post("/api/razorpay", formData)
+      if (!response.data || !response.data.order) {
+        throw new Error("Failed to create order")
+      }
+      
       const { order } = response.data
 
       const options: RazorpayOptions = {
         key_id: process.env.NEXT_PUBLIC_RAZORPAY_ID!,
         amount: order.amount,
         currency: order.currency,
-        name: order.notes.customerName,
+        name: "Get Me A Beer",
+        description: "Support with a virtual beer!",
         order_id: order.id,
         handler: async (response: RazorpayResponse) => {
-          const newTransaction: Transaction = {
-            customerName: formData.username,
-            amount: parseFloat(formData.amount),
-            message: formData.message,
-          }
+          try {
+            const newTransaction: Transaction = {
+              customerName: formData.username,
+              amount: parseFloat(formData.amount),
+              message: formData.message,
+            }
 
-          setTransactions((prevTransactions) => [
-            ...prevTransactions,
-            newTransaction,
-          ])
-          await axios.post("/api/database", {
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            order,
-            message: formData.message,
-          })
+            setTransactions((prevTransactions) => [
+              ...prevTransactions,
+              newTransaction,
+            ])
+
+            await axios.post("/api/database", {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              order,
+              message: formData.message,
+            })
+
+            toast.success("Payment successful!")
+            router.push("/dashboard?success=true")
+          } catch (error) {
+            console.error("Error saving transaction:", error)
+            toast.error("Payment successful but failed to save transaction")
+          }
         },
-        callback_url: "/dashboard/?success=true",
+        modal: {
+          ondismiss: function() {
+            toast.info("Payment cancelled")
+          }
+        },
         prefill: {
           name: order.notes.customerName,
           email: order.notes.costumerEmail,
@@ -197,7 +220,7 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error("Payment initiation failed:", error)
-      toast.error("Failed to process payment")
+      toast.error(error instanceof Error ? error.message : "Failed to process payment")
     } finally {
       setIsSubmitting(false)
     }

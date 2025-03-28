@@ -1,15 +1,15 @@
-"use client"
-import beer1 from "@/public/beer1.svg"
-import good from "@/public/good.webp"
-import Image from "next/image"
-import coin from "@/public/coin.webp"
-import Button from "./ui/button2"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import coding from "@/public/coding.webp"
+"use client";
+import beer1 from "@/public/beer1.svg";
+import good from "@/public/good.webp";
+import Image from "next/image";
+import coin from "@/public/coin.webp";
+import Button from "./ui/button2";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import coding from "@/public/coding.webp";
 export default function Homepage() {
-  const session = useSession()
-  const router = useRouter()
+  const session = useSession();
+  const router = useRouter();
   return (
     <div className="relative size-full h-[calc(100vh-3.5rem)] bg-slate-950">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
@@ -38,16 +38,16 @@ export default function Homepage() {
             <div
               onClick={() => {
                 if (session.status === "authenticated") {
-                  return router.push("/dashboard")
+                  return router.push("/dashboard");
                 }
-                return router.push("/signin")
+                return router.push("/signin");
               }}
             >
               <Button value={"Get Started"} />
             </div>
             <div
               onClick={() => {
-                router.push("/docs")
+                router.push("/docs");
               }}
             >
               <Button value={"Read More"} />
@@ -64,7 +64,7 @@ export default function Homepage() {
             <div className="flex gap-y-2 justify-center flex-col items-center">
               <Image src={coin} alt="coin" width={180} height={180} />
               <h1 className="font-bold text-lg">Fans Want to Cheers</h1>
-              <h1 className="font-semibold ">
+              <h1 className="font-semibold text-gray-300 ">
                 &quot; Your fans are here to raise a glass and show their
                 support.&quot;
               </h1>
@@ -78,7 +78,7 @@ export default function Homepage() {
                 height={180}
               />
               <h1 className="font-bold text-lg">Fans want to donate</h1>
-              <h1 className="font-semibold">
+              <h1 className="font-semibold text-gray-300">
                 &quot;Your fans are eager to fund your next beer&quot;
               </h1>
             </div>
@@ -91,7 +91,7 @@ export default function Homepage() {
                 height={180}
               />
               <h1 className="font-bold text-lg">Fans want to join</h1>
-              <h1 className="font-semibold">
+              <h1 className="font-semibold text-gray-300">
                 &quot;Your fans are eager to be a part of your beer
                 adventures.&quot;
               </h1>
@@ -100,5 +100,5 @@ export default function Homepage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
